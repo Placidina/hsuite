@@ -135,10 +135,19 @@ class InstallScriptsCommand(InstallScripts):
 class SDistCommand(SDist):
     def run(self):
         library_symlinks = _find_symlinks('lib', '.py')
-        symlinks = {'script': _find_symlinks(
-            'bin'), 'library': library_symlinks}
+        symlinks = {
+            'script': _find_symlinks('bin'),
+            'library': library_symlinks
+        }
         _cache_symlinks(symlinks)
+
         SDist.run(self)
+
+        if os.environ.get('_HSUITE_SDIST_FROM_MAKEFILE', False) != '1':
+            warnings.warn('When setup.py sdist is run from outside of the Makefile,'
+                          ' the generated tarball may be incomplete.  Use `make snapshot`'
+                          ' to create a tarball from an arbitrary checkout.',
+                          RuntimeWarning)
 
 
 def read_file(file_name):
@@ -154,8 +163,30 @@ def read_requirements(file_name):
     reqs = read_file(file_name).splitlines()
     if not reqs:
         raise RuntimeError(
-            "Unable to read requirements from the %s file That indicates this copy of the source code is incomplete." % file_name)
+            "Unable to read requirements from the %s file"
+            "That indicates this copy of the source code is incomplete."
+            % file_name
+        )
     return reqs
+
+
+def read_extras():
+    """Specify any extra requirements for installation."""
+    extras = dict()
+    extra_requirements_dir = 'packaging/requirements'
+    for extra_requirements_filename in os.listdir(extra_requirements_dir):
+        filename_match = re.search(
+            r'^requirements-(\w*).txt$', extra_requirements_filename)
+        if not filename_match:
+            continue
+        extra_req_file_path = os.path.join(
+            extra_requirements_dir, extra_requirements_filename)
+        try:
+            extras[filename_match.group(1)] = read_file(
+                extra_req_file_path).splitlines()
+        except RuntimeError:
+            pass
+    return extras
 
 
 def get_dynamic_setup_params():
@@ -165,6 +196,7 @@ def get_dynamic_setup_params():
         'long_description': read_file('README.md'),
         'long_description_content_type': 'text/markdown',
         'install_requires': read_requirements('requirements.txt'),
+        'extras_require': read_extras(),
     }
 
 
@@ -181,10 +213,12 @@ static_setup_params = dict(
     description="HSuite is a toolset for pentest",
     author=__author__,
     author_email="placidina@protonmail.com",
+    url='https://github.com/Placidina/hsuite',
     project_urls={
         'Bug Tracker': "https://github.com/Placidina/hsuite/issues",
         'Source Code': "https://github.com/Placidina/hsuite",
     },
+    license='MIT',
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
     package_dir={'': 'lib'},
     packages=find_packages('lib'),
