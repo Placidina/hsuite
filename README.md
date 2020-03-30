@@ -1,5 +1,7 @@
 # HSuite
 
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/Placidina/hsuite/blob/master/LICENSE)
+
 HSuite is a HTTP Protocol brute force.
 
 Works on Python versions:
