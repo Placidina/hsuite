@@ -202,7 +202,7 @@ static_setup_params = dict(
         "Topic :: Utilities",
     ],
     scripts=[
-        'bin/hsuite',
+        'bin/hsuite-s3dump',
     ],
     data_files=[],
     zip_safe=False
