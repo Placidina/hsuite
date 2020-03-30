@@ -20,6 +20,8 @@ Works on Python versions:
 
 ## Install
 
-- Simple: `pip install hsuite`
-**or**
-- Extras for scripts: `pip install hsuite[s3dump,...]`
+```sh
+pip install hsuite
+```
+
+> **Note:** To install scripts requirements, using `extra` install: `pip install hsuite[s3dump,...]`
