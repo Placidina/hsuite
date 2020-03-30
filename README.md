@@ -14,7 +14,7 @@ Works on Python versions:
 
 ## Tools
 
-- [S3Dump](docs/s3dump.md)
+- [S3Dump](docs/s3dump/README.md)
 
 ## Install
 
