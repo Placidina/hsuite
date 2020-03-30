@@ -19,7 +19,7 @@ Some improvements:
 ## Usage
 
 ```sh
-usage: s3dump [-h] [--version] [-v] [--debug] (-b BUCKET | --list-buckets LIST_BUCKETS) [-d] [-o OUT] [-w LIST_KEYWORDS] [-m MAX_FILE_SIZE]
+usage: hsuite-s3dump [-h] [--version] [-v] [--debug] (-b BUCKET | --list-buckets LIST_BUCKETS) [-d] [-o OUT] [-w LIST_KEYWORDS] [-m MAX_FILE_SIZE]
               [-t THREADS] [-p PROXY] [--out-interesting OUT_INTERESTING]
 
 Run S3Dump
