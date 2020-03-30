@@ -16,9 +16,10 @@ Works on Python versions:
 
 ## Tools
 
-- [S3Dump](docs/s3dump/README.md)
+- [S3Dump](https://github.com/Placidina/hsuite/blob/master/docs/s3dump/README.md)
 
 ## Install
 
-- ***pip:*** `pip install .`
-- ***setuptools:*** `python setup.py install`
+```sh
+pip install hsuite
+```

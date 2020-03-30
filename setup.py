@@ -144,7 +144,7 @@ class SDistCommand(SDist):
 def read_file(file_name):
     """Read file and return its contents."""
 
-    with open(file_name, 'r') as f:
+    with open(file_name, 'r', encoding='utf-8') as f:
         return f.read()
 
 
@@ -163,6 +163,7 @@ def get_dynamic_setup_params():
 
     return {
         'long_description': read_file('README.md'),
+        'long_description_content_type': 'text/markdown',
         'install_requires': read_requirements('requirements.txt'),
     }
 
@@ -191,7 +192,10 @@ static_setup_params = dict(
     classifiers=[
         "Environment :: Console",
         "Intended Audience :: Information Technology",
-        "Programming Language:: Python:: 2",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
