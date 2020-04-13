@@ -13,7 +13,7 @@ from hsuite import context, constants as C
 from hsuite.errors import HSuiteOptionsError, HSuiteAssertionError
 from hsuite.modules.http import HTTP
 from hsuite.utils.display import Display
-from hsuite.modules import HTTP, Thread
+from hsuite.modules import HTTP, HTTPBasicAuth, HTTPDigestAuth, Thread
 from hsuite.utils.common.text.converters import json
 from hsuite.utils.six.moves.urllib.parse import urlparse
 from hsuite.utils.six import PY3
@@ -61,12 +61,12 @@ class BruteCLI(CLI):
             '--no-expected-response', dest='no_expected_response', default=None, help="No expected response contain")
 
         auth_type = self.parser.add_mutually_exclusive_group()
-        auth_type.parser.add_argument(
-            '--auth-basic' dest='auth_basic', default=False, action='store_true' help="Basic HTTP authentication")
-        auth_type.parser.add_argument(
-            '--auth-digest' dest='auth_digest', default=False, action='store_true' help="Digest access authentication")
-        auth_type.parser.add_argument(
-            '--auth-ntlm' dest='auth_ntlm', default=False, action='store_true' help="NTLM authentication")
+        auth_type.add_argument(
+            '--auth-basic', dest='auth_basic', default=False, action='store_true', help="Basic HTTP authentication")
+        auth_type.add_argument(
+            '--auth-digest', dest='auth_digest', default=False, action='store_true', help="Digest access authentication")
+        auth_type.add_argument(
+            '--auth-ntlm', dest='auth_ntlm', default=False, action='store_true', help="NTLM authentication")
 
         self.parser.add_argument(
             '--target', dest='target', required=True, help="URL")
@@ -213,13 +213,13 @@ class BruteCLI(CLI):
                 url = context.CLIARGS['target']
 
                 if context.CLIARGS['auth_basic']:
-                    auth = http.auth.HTTPBasicAuth(user, password)
+                    auth = HTTPBasicAuth(user, password)
                 elif context.CLIARGS['auth_digest']:
-                    auth = http.auth.HTTPDigestAuth(user, password)
+                    auth = HTTPDigestAuth(user, password)
                 elif context.CLIARGS['auth_ntlm']:
                     auth = requests_ntlm.HttpNtlmAuth(user, password)
                 else:
-                    template = HTemplate(context.CLIARGS['url'])
+                    template = HTemplate(url)
                     url = template.substitute(Username=user, Password=password)
 
                 resp = http.request(

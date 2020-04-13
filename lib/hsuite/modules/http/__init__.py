@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from requests import Session
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 
 class HTTP(Session):
