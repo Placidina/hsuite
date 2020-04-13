@@ -3,6 +3,7 @@ __metaclass__ = type
 
 from requests import Session
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests_ntlm import HttpNtlmAuth
 
 
 class HTTP(Session):

@@ -6,14 +6,13 @@ import os
 import sys
 from string import Template
 from random import randint
-from requests_ntlm import HttpNtlmAuth
 
 from hsuite.cli import CLI
 from hsuite import context, constants as C
 from hsuite.errors import HSuiteOptionsError, HSuiteAssertionError
 from hsuite.modules.http import HTTP
 from hsuite.utils.display import Display
-from hsuite.modules import HTTP, HTTPBasicAuth, HTTPDigestAuth, Thread
+from hsuite.modules import HTTP, HTTPBasicAuth, HTTPDigestAuth, HttpNtlmAuth, Thread
 from hsuite.utils.common.text.converters import json
 from hsuite.utils.six.moves.urllib.parse import urlparse
 from hsuite.utils.six import PY3
