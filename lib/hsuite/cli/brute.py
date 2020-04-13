@@ -4,9 +4,9 @@ __requires__ = ['hsuite']
 
 import os
 import sys
-import requests_ntlm
 from string import Template
 from random import randint
+from requests_ntlm import HttpNtlmAuth
 
 from hsuite.cli import CLI
 from hsuite import context, constants as C
@@ -218,7 +218,7 @@ class BruteCLI(CLI):
                 elif context.CLIARGS['auth_digest']:
                     auth = HTTPDigestAuth(user, password)
                 elif context.CLIARGS['auth_ntlm']:
-                    auth = requests_ntlm.HttpNtlmAuth(user, password)
+                    auth = HttpNtlmAuth(user, password)
                 else:
                     template = HTemplate(url)
                     url = template.substitute(Username=user, Password=password)
