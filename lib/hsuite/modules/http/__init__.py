@@ -5,8 +5,11 @@ from requests import Session
 
 
 class HTTP(Session):
-    def __init__(self, proxy=None):
+    def __init__(self, headers=None, proxy=None):
         super(HTTP, self).__init__()
 
         if proxy:
             self.proxies = dict(http=proxy, https=proxy)
+
+        if headers:
+            self.headers = headers

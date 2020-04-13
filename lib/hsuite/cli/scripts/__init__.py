@@ -50,7 +50,6 @@ if __name__ == '__main__':
 
     try:
         display = Display()
-        # display.debug("Starting run")
 
         sub = None
         target = me.split('-')
@@ -67,8 +66,8 @@ if __name__ == '__main__':
             raise HSuiteError("Unknown HSuite alias: %s" % me)
 
         try:
-            mycli = getattr(__import__("hsuite.cli.%s" %
-                                       sub, fromlist=[myclass]), myclass)
+            mycli = getattr(
+                __import__("hsuite.cli.%s" % sub, fromlist=[myclass]), myclass)
         except ImportError as e:
             if 'msg' in dir(e):
                 msg = e.msg

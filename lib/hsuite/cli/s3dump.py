@@ -12,9 +12,8 @@ from hsuite.errors import HSuiteOptionsError
 from hsuite.modules.http import HTTP
 from hsuite.utils.display import Display
 from hsuite.modules import HTTP, Thread, LockThread
-
+from hsuite.utils.six.moves.urllib.parse import urlparse
 from hsuite.utils.six.moves.queue import Queue
-import hsuite.utils.six.moves.urllib.parse as urlparse
 
 
 display = Display()

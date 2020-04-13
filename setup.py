@@ -241,6 +241,7 @@ static_setup_params = dict(
     ],
     scripts=[
         'bin/hsuite-s3dump',
+        'bin/hsuite-brute'
     ],
     data_files=[],
     zip_safe=False
