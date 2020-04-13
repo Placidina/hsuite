@@ -4,6 +4,7 @@ __requires__ = ['hsuite']
 
 import os
 import sys
+import requests_ntlm
 from string import Template
 from random import randint
 
@@ -21,6 +22,18 @@ from hsuite.utils.six import PY3
 display = Display()
 
 
+class HTemplate(Template):
+    delimiter = '{{'
+    pattern = r'''
+    \{\{\s?(?:
+    (?P<escaped>\{\{)|
+    (?P<named>[_a-z][_a-z0-9]*)\s?\}\}|
+    (?P<braced>[_a-z][_a-z0-9]*)\s?\}\}|
+    (?P<invalid>)
+    )
+    '''
+
+
 class BruteCLI(CLI):
     def __init__(self, args):
         super(BruteCLI, self).__init__(args)
@@ -35,20 +48,28 @@ class BruteCLI(CLI):
 
         user = self.parser.add_mutually_exclusive_group(required=True)
         user.add_argument(
-            '--user', dest='users', default=[], action='append', help="Username(s)")
+            '-u', '--user', dest='users', default=[], action='append', help="Username(s)")
         user.add_argument(
             '--user-list', dest='user_list', help="File path that has a users names list")
 
         expected = self.parser.add_mutually_exclusive_group(required=True)
         expected.add_argument(
-            '--expected-code', dest='expected_code', default=[], type=int, nargs='+', help="Expected code(s) for success login")
+            '--expected-codes', dest='expected_codes', default=[], type=int, nargs='+', help="Expected code(s) for success login")
         expected.add_argument(
             '--expected-response', dest='expected_response', default=None, help="Expected response contain")
         expected.add_argument(
             '--no-expected-response', dest='no_expected_response', default=None, help="No expected response contain")
 
+        auth_type = self.parser.add_mutually_exclusive_group()
+        auth_type.parser.add_argument(
+            '--auth-basic' dest='auth_basic', default=False, action='store_true' help="Basic HTTP authentication")
+        auth_type.parser.add_argument(
+            '--auth-digest' dest='auth_digest', default=False, action='store_true' help="Digest access authentication")
+        auth_type.parser.add_argument(
+            '--auth-ntlm' dest='auth_ntlm', default=False, action='store_true' help="NTLM authentication")
+
         self.parser.add_argument(
-            '-u', '--url', dest='url', required=True, help="Full url to execute brute force")
+            '--target', dest='target', required=True, help="URL")
         self.parser.add_argument(
             '-m', '--method', dest='method', type=str.upper, choices=['GET', 'POST'], default='GET', help="Request type")
         self.parser.add_argument(
@@ -73,9 +94,9 @@ class BruteCLI(CLI):
             raise HSuiteOptionsError(
                 "%s is not a valid or accessible file" % options.password_list)
 
-        if options.url and not urlparse(options.url).netloc:
+        if options.target and not urlparse(options.target).netloc:
             raise HSuiteOptionsError(
-                "%s is not a valid url" % options.url)
+                "%s is not a valid url" % options.target)
 
         if options.proxy and not urlparse(options.proxy).netloc:
             raise HSuiteOptionsError(
@@ -188,11 +209,23 @@ class BruteCLI(CLI):
                     else:
                         data = t.substitute(username=user, password=password)
 
-                t = Template(context.CLIARGS['url'])
-                url = t.substitute(username=user, password=password)
-                resp = http.request(context.CLIARGS['method'], url, data=data)
+                auth = None
+                url = context.CLIARGS['target']
 
-                if context.CLIARGS['expected_code'] and resp.status_code in context.CLIARGS['expected_code']:
+                if context.CLIARGS['auth_basic']:
+                    auth = http.auth.HTTPBasicAuth(user, password)
+                elif context.CLIARGS['auth_digest']:
+                    auth = http.auth.HTTPDigestAuth(user, password)
+                elif context.CLIARGS['auth_ntlm']:
+                    auth = requests_ntlm.HttpNtlmAuth(user, password)
+                else:
+                    template = HTemplate(context.CLIARGS['url'])
+                    url = template.substitute(Username=user, Password=password)
+
+                resp = http.request(
+                    context.CLIARGS['method'], url, auth=auth, data=data)
+
+                if context.CLIARGS['expected_codes'] and resp.status_code in context.CLIARGS['expected_codes']:
                     self.results.append(
                         {'username': user, 'password': password})
                     if display.verbosity >= 1:
