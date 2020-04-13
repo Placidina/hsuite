@@ -202,12 +202,13 @@ class BruteCLI(CLI):
                 data = None
 
                 if context.CLIARGS['method'] == 'POST' and context.CLIARGS['data']:
-                    t = Template(context.CLIARGS['data'])
+                    template = Template(context.CLIARGS['data'])
                     if headers['Content-Type'] and 'json' in headers['Content-Type'].lower():
                         data = json.dump(
-                            t.substitute(username=user, password=password))
+                            template.substitute(Username=user, Password=password))
                     else:
-                        data = t.substitute(username=user, password=password)
+                        data = template.substitute(
+                            Username=user, Password=password)
 
                 auth = None
                 url = context.CLIARGS['target']
