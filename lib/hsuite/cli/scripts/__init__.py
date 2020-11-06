@@ -6,9 +6,7 @@ __metaclass__ = type
 __requires__ = ['hsuite']
 
 
-import errno
 import os
-import shutil
 import sys
 import traceback
 

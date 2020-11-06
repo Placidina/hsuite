@@ -5,16 +5,16 @@ __requires__ = ['hsuite']
 import xmltodict
 import shutil
 import humanfriendly
+import os
 
 from hsuite import context
 from hsuite.cli import CLI
 from hsuite.errors import HSuiteOptionsError
-from hsuite.modules.http import HTTP
 from hsuite.utils.display import Display
 from hsuite.modules import HTTP, Thread, LockThread
 
 from hsuite.utils.six.moves.queue import Queue
-import hsuite.utils.six.moves.urllib.parse as urlparse
+from hsuite.utils.six.moves.urllib.parse import urlparse
 
 
 display = Display()
@@ -48,7 +48,9 @@ class S3dumpCLI(CLI):
         self.parser.add_argument(
             '-o', '--out', dest='out', default='.', help="Path where downloads will be saved")
         self.parser.add_argument(
-            '-w', '--list-keywords', dest='list_keywords', help="File path that contains a list of keywords for grep")
+            '--list-keywords', dest='list_keywords', help="File path that contains a list of keywords for grep")
+        self.parser.add_argument(
+            '-w', dest='keywords', help="Text separated for \",\" to keywords for grep")
         self.parser.add_argument(
             '-m', '--max-file-size', dest='max_file_size', type=str, default='1M', help="Maximum file size to download")
         self.parser.add_argument(
@@ -84,7 +86,7 @@ class S3dumpCLI(CLI):
         try:
             self.max_file_size = humanfriendly.parse_size(
                 options.max_file_size)
-        except:
+        except Exception:
             raise HSuiteOptionsError(
                 "%s is not a valide size" % options.max_file_size)
 
@@ -102,6 +104,8 @@ class S3dumpCLI(CLI):
         if context.CLIARGS['list_keywords']:
             with open(context.CLIARGS['list_keywords'], 'r') as content:
                 self.key_words_list = [line.strip() for line in content]
+        elif context.CLIARGS['keywords']:
+            self.key_words_list = context.CLIARGS['keywords'].strip().split(",")
 
         for i in range(0, context.CLIARGS['threads']):
             display.vv("Starting scan thread %d ..." % i)
@@ -168,7 +172,6 @@ class S3dumpCLI(CLI):
                     display.display("Pilfering %s ..." % url)
 
                     keys = []
-                    interest = []
                     objects = xmltodict.parse(response.text)
 
                     try:
@@ -182,10 +185,9 @@ class S3dumpCLI(CLI):
                                     "\"%s/%s\" is a greater than the specified max file size" % (url, child['Key']))
                             else:
                                 keys.append(child['Key'])
-                    except:
+                    except Exception:
                         pass
 
-                    hit = False
                     for words in keys:
                         words = (str(words)).rstrip()
                         collectable = "%s/%s" % (url, words)
